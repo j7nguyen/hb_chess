@@ -1,11 +1,13 @@
-=begin
-This program takes in a state of a chess board, represented by an array of arrays.
-Each row has 'EE' for empty, or two-character string with the first character representing
-the color of the piece and the second character representing the type, i.e. 'WN' for white knight.
-'P' = Pawn, 'R' = Rook, 'N' = Knight, 'B' = Bishop, 'K' = King, 'Q' = Queen
-=end
+# This program takes in a state of a chess board, represented by an array of arrays.
+# Each row has 'EE' for empty, or two-character string with the first character representing
+# the color of the piece and the second character representing the type, i.e. 'WN' for white knight.
+# 'P' = Pawn, 'R' = Rook, 'N' = Knight, 'B' = Bishop, 'K' = King, 'Q' = Queen
+
+# Methods assume correctly formatted inputs, including the board and color.
+
 class Chess
-  INITIAL_BOARD =
+  # default state for the board of a chess object
+  INITIAL_STATE =
   [
     ['BR','BN','BB','BK','BQ','BB','BN','BR'],
     ['BP','BP','BP','BP','BP','BP','BP','BP'],
@@ -27,8 +29,18 @@ class Chess
   }
   attr_accessor :board
 
-  def initialize(board=INITIAL_BOARD)
+  # Create a Chess object with a board formatted like INITIAL_STATE above. If a board
+  # is not passed in, INITIAL_STATE will be used.
+  #
+  def initialize(board=INITIAL_STATE)
     @board = board
+  end
+
+  # Once a board is created, formatted possible moves for each color can be generated.
+  # Use print_moves for an easy-to-read format or formatted_moves for the strings in an array.
+  #
+  def print_moves(color)
+    puts formatted_moves(color)
   end
 
   def formatted_moves(color)
@@ -53,6 +65,8 @@ class Chess
     color == 'W' ? 'white' : 'black'
   end
 
+  # Finds all of a player's pieces on the board.
+  #
   def find_pieces(color)
     pieces = []
     @board.each_with_index do |row, rownum|
@@ -65,6 +79,8 @@ class Chess
     pieces
   end
 
+  # For each piece, checks all moves and adds them to an array of the player's moves.
+  #
   def check_player_moves(pieces, color)
     moves = []
     pieces.each do |piece|
@@ -76,6 +92,8 @@ class Chess
     moves
   end
 
+  # Depending on the piece in question, a different method is used.
+  #
   def check_piece_moves(piece, color)
     case piece[0]
     when "P"
@@ -98,13 +116,20 @@ class Chess
   def find_pawn_moves(piece, color)
     moves = []
     row, col = piece[1,2]
-    difference = (color == 'W' ? -1 : 1)
+    direction = (color == 'W' ? -1 : 1)
     start_row = (color == 'W' ? 6 : 1)
-    one_forward, two_forward = row + difference, row + 2 * difference
-    if legal_space?(one_forward, col, color)
+    one_forward, two_forward = row + direction, row + 2 * direction
+    if @board[one_forward][col] == 'EE'
       moves << [one_forward, col]
-      if row == start_row && legal_space?(two_forward, col, color)
+      if row == start_row && @board[two_forward][col]
         moves << [two_forward, col]
+      end
+    end
+    opposite = (color == 'W' ? 'B' : 'W')
+    [[one_forward, col - 1], [one_forward, col + 1]].each do |capture_try|
+      check_row, check_col = capture_try
+      if legal_space?(check_row, check_col, color) && @board[check_row][check_col][0] == opposite
+        moves << capture_try
       end
     end
     moves
@@ -134,16 +159,22 @@ class Chess
     straight_moves + diagonal_moves
   end
 
+  # Used by rooks and queens.
+  #
   def find_horiz_vert_line_moves(piece, color)
     directions = [[-1,0], [0,-1], [0,1], [1,0]]
     find_line_moves(directions, piece, color)
   end
 
+  # Used by bishops and queens
+  #
   def find_diagonal_line_moves(piece, color)
     directions = [[-1,-1], [-1,1], [1,-1], [1,1]]
     find_line_moves(directions, piece, color)
   end
 
+  # Used by knights and kings.
+  #
   def find_one_move(directions, piece, color)
     moves = []
     row, col = piece[1,2]
@@ -154,6 +185,9 @@ class Chess
     moves
   end
 
+  # Used by rooks, bishops, and queens. Keeps going in a direction until it reaches
+  # an edge of the board, the player's own piece, or the player has captured a piece.
+  #
   def find_line_moves(directions, piece, color)
     moves = []
     row, col = piece[1,2]
@@ -174,9 +208,26 @@ class Chess
     moves
   end
 
+  # Checks if a specified space can be moved to by a player's piece. It must be
+  # on the board and not have one of the player's pieces.
+  #
   def legal_space?(row, col, color)
     return false if row < 0 || col < 0 || row > 7 || col > 7
     space = @board[row][col]
     space == 'EE' || space[0] != color
   end
 end
+
+test_board = [
+  ['BR','BN','BB','BK','EE','BB','BN','BR'],
+  ['BP','BP','BP','BP','EE','BP','BP','BP'],
+  ['EE','EE','EE','EE','EE','EE','EE','EE'],
+  ['EE','EE','EE','EE','BP','EE','BQ','EE'],
+  ['EE','EE','EE','WP','WP','EE','WQ','EE'],
+  ['EE','EE','EE','EE','EE','EE','EE','EE'],
+  ['WP','WP','WP','EE','EE','WP','WP','WP'],
+  ['WR','WN','WB','WK','WQ','WB','WN','WR']
+]
+
+game = Chess.new(test_board)
+game.print_moves('W')

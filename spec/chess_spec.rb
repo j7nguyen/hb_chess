@@ -21,7 +21,7 @@ RSpec.describe Chess, '#find_pieces' do
 end
 
 RSpec.describe Chess, '#find_pawn_moves' do
-  context "For white pawn" do
+  context "For initial state" do
     it "Allows proper movement upward" do
       chess = Chess.new
       piece = chess.find_pieces('W')[0]
@@ -29,12 +29,22 @@ RSpec.describe Chess, '#find_pawn_moves' do
       expect(chess.check_piece_moves(piece, 'W')).to eq [[5,0], [4,0]]
     end
   end
-  context "For black pawn" do
-    it "Allows proper movement downward" do
-      chess = Chess.new
-      piece = chess.find_pieces('B')[9]
-      expect(piece).to eq ['P', 1, 1]
-      expect(chess.check_piece_moves(piece, 'B')).to eq [[2,1], [3,1]]
+  context "For middle of a game" do
+    it "Only allows forward movement to empty space. Allows capture" do
+      test_board = [
+        ['BR','BN','BB','BK','EE','BB','BN','BR'],
+        ['BP','BP','BP','BP','EE','BP','BP','BP'],
+        ['EE','EE','EE','EE','EE','EE','EE','EE'],
+        ['EE','EE','EE','EE','BP','EE','BQ','EE'],
+        ['EE','EE','EE','WP','WP','EE','WQ','EE'],
+        ['EE','EE','EE','EE','EE','EE','EE','EE'],
+        ['WP','WP','WP','EE','EE','WP','WP','WP'],
+        ['WR','WN','WB','WK','WQ','WB','WN','WR']
+      ]
+      chess = Chess.new(test_board)
+      piece = chess.find_pieces('B')[14]
+      expect(piece).to eq ['P', 3, 4]
+      expect(chess.check_piece_moves(piece, 'B')).to eq [[4,3]]
     end
   end
 end
