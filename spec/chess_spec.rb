@@ -71,18 +71,18 @@ RSpec.describe Chess, '#find_horiz_vert_line_moves' do
         ['BP','BP','BP','BP','EE','BP','BP','BP'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
         ['EE','EE','EE','EE','BP','EE','BQ','EE'],
-        ['WP','EE','EE','EE','EE','EE','EE','EE'],
+        ['WP','EE','EE','EE','WP','EE','WQ','EE'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
-        ['EE','WP','WP','WP','WP','WP','WP','WP'],
-        ['WR','WN','WB','WK','WQ','WB','WN','WR']
+        ['EE','WP','WP','WP','EE','WP','WP','WP'],
+        ['WR','WN','WB','WK','EE','WB','WN','WR']
       ]
       chess = Chess.new(test_board)
-      piece1 = chess.find_pieces('W')[8]
+      piece1 = chess.find_pieces('W')[9]
       expect(piece1).to eq ['R', 7, 0]
       expect(chess.find_horiz_vert_line_moves(piece1, 'W')).to eq [[6,0], [5,0]]
       piece2 = chess.find_pieces('B')[15]
       expect(piece2).to eq ['Q', 3, 6]
-      expect(chess.find_horiz_vert_line_moves(piece2, 'B').sort).to eq [[2,6], [3,5], [3,7],[4,6],[5,6],[6,6]]
+      expect(chess.find_horiz_vert_line_moves(piece2, 'B').sort).to eq [[2,6], [3,5], [3,7],[4,6]]
     end
   end
 end
@@ -102,13 +102,13 @@ RSpec.describe Chess, '#find_diagonal_line_moves' do
         ['BP','BP','BP','BP','EE','BP','BP','BP'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
         ['EE','EE','EE','EE','BP','EE','BQ','EE'],
-        ['EE','WP','EE','EE','EE','EE','EE','EE'],
+        ['EE','WP','EE','EE','WP','EE','WQ','EE'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
-        ['WP','EE','WP','WP','WP','WP','WP','WP'],
+        ['WP','EE','WP','WP','EE','WP','WP','WP'],
         ['WR','WN','WB','WK','WQ','WB','WN','WR']
       ]
       chess = Chess.new(test_board)
-      piece1 = chess.find_pieces('W')[10]
+      piece1 = chess.find_pieces('W')[11]
       expect(piece1).to eq ['B', 7, 2]
       expect(chess.find_diagonal_line_moves(piece1, 'W')).to eq [[6,1], [5,0]]
       piece2 = chess.find_pieces('B')[15]
@@ -133,10 +133,10 @@ RSpec.describe Chess, '#find_king_moves' do
         ['BP','BP','BP','BP','EE','BP','BP','BP'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
         ['EE','EE','EE','EE','BP','EE','BQ','EE'],
-        ['EE','WP','EE','EE','EE','EE','EE','EE'],
+        ['EE','WP','EE','EE','WP','EE','WQ','EE'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
-        ['WP','EE','WP','WP','WP','WP','WP','WP'],
-        ['WR','WN','WB','WK','WQ','WB','WN','WR']
+        ['WP','EE','WP','WP','EE','WP','WP','WP'],
+        ['WR','WN','WB','WK','EE','WB','WN','WR']
       ]
       chess = Chess.new(test_board)
       piece1 = chess.find_pieces('B')[3]
@@ -161,16 +161,87 @@ RSpec.describe Chess, '#find_queen_moves' do
         ['BP','BP','BP','BP','EE','BP','BP','BP'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
         ['EE','EE','EE','EE','BP','EE','BQ','EE'],
-        ['EE','WP','EE','EE','EE','EE','EE','EE'],
+        ['EE','WP','EE','EE','WP','EE','WQ','EE'],
         ['EE','EE','EE','EE','EE','EE','EE','EE'],
-        ['WP','EE','WP','WP','WP','WP','WP','WP'],
-        ['WR','WN','WB','WK','WQ','WB','WN','WR']
+        ['WP','EE','WP','WP','EE','WP','WP','WP'],
+        ['WR','WN','WB','WK','EE','WB','WN','WR']
       ]
       chess = Chess.new(test_board)
       piece1 = chess.find_pieces('B')[15]
       expect(piece1).to eq ['Q', 3, 6]
       expect(chess.find_queen_moves(piece1, 'B').sort).to eq [[1,4],[2,5],[2,6],
-      [2,7],[3,5],[3,7],[4,5],[4,6],[4,7],[5,4],[5,6],[6,3],[6,6]]
+      [2,7],[3,5],[3,7],[4,5],[4,6],[4,7],[5,4],[6,3]]
+    end
+  end
+end
+
+RSpec.describe Chess, '#check_piece_moves' do
+  context "Will check all moves for any piece" do
+    it "Won't show any valid moves for a queen in an initial board" do
+      chess = Chess.new
+      piece = chess.find_pieces('W')[12]
+      expect(piece).to eq ['Q', 7, 4]
+      expect(chess.check_piece_moves(piece, 'W')).to eq []
+    end
+
+    it "Will show valid moves for a queen" do
+      test_board = [
+        ['BR','BN','BB','BK','EE','BB','BN','BR'],
+        ['BP','BP','BP','BP','EE','BP','BP','BP'],
+        ['EE','EE','EE','EE','EE','EE','EE','EE'],
+        ['EE','EE','EE','EE','BP','EE','BQ','EE'],
+        ['EE','WP','EE','EE','WP','EE','WQ','EE'],
+        ['EE','EE','EE','EE','EE','EE','EE','EE'],
+        ['WP','EE','WP','WP','EE','WP','WP','WP'],
+        ['WR','WN','WB','WK','EE','WB','WN','WR']
+      ]
+      chess = Chess.new(test_board)
+      piece1 = chess.find_pieces('B')[15]
+      expect(piece1).to eq ['Q', 3, 6]
+      expect(chess.check_piece_moves(piece1, 'B').sort).to eq [[1,4],[2,5],[2,6],
+      [2,7],[3,5],[3,7],[4,5],[4,6],[4,7],[5,4],[6,3]]
+    end
+  end
+end
+
+RSpec.describe Chess, '#check_player_moves' do
+  context "Will get all moves for a player" do
+    it "Creates a hash with pieces as keys and moves for each piece as values" do
+      chess = Chess.new
+      white_pieces = chess.find_pieces('W')
+      expect(chess.check_player_moves(white_pieces, 'W')).not_to be_empty
+    end
+  end
+end
+
+RSpec.describe Chess, '#formatted_moves' do
+  context "Will output a player's possible moves in readable format" do
+    it "Shows all the possible moves for the first move of the game" do
+        chess = Chess.new
+        desired_output = [
+          "Pawn at <7:1> can move to <5:1>",
+          "Pawn at <7:1> can move to <6:1>",
+          "Pawn at <7:2> can move to <5:2>",
+          "Pawn at <7:2> can move to <6:2>",
+          "Pawn at <7:3> can move to <5:3>",
+          "Pawn at <7:3> can move to <6:3>",
+          "Pawn at <7:4> can move to <5:4>",
+          "Pawn at <7:4> can move to <6:4>",
+          "Pawn at <7:5> can move to <5:5>",
+          "Pawn at <7:5> can move to <6:5>",
+          "Pawn at <7:6> can move to <5:6>",
+          "Pawn at <7:6> can move to <6:6>",
+          "Pawn at <7:7> can move to <5:7>",
+          "Pawn at <7:7> can move to <6:7>",
+          "Pawn at <7:8> can move to <5:8>",
+          "Pawn at <7:8> can move to <6:8>",
+          "Knight at <8:2> can move to <6:1>",
+          "Knight at <8:2> can move to <6:3>",
+          "Knight at <8:7> can move to <6:6>",
+          "Knight at <8:7> can move to <6:8>",
+          "20 legal moves (10 unique pieces) for white player"
+        ]
+        expect(chess.formatted_moves('W')).to eq(desired_output)
     end
   end
 end

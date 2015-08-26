@@ -17,15 +17,40 @@ class Chess
     ['WR','WN','WB','WK','WQ','WB','WN','WR']
   ]
 
+  PIECES = {
+    'P' => 'Pawn',
+    'R' => 'Rook',
+    'N' => 'Knight',
+    'B' => 'Bishop',
+    'K' => 'King',
+    'Q' => 'Queen'
+  }
   attr_accessor :board
 
   def initialize(board=INITIAL_BOARD)
     @board = board
   end
 
-  def all_moves(board, color)
-    pieces = find_pieces(board, color)
-    check_moves(pieces, board)
+  def formatted_moves(color)
+    pieces = find_pieces(color)
+    move_strings = []
+    moves = check_player_moves(pieces, color)
+    moves.each do |move|
+      piece_name = PIECES[move[0][0]]
+      start_row, start_col = move[0][1,2]
+      dest_row, dest_col = move[1]
+      move_str = "#{piece_name} at <#{start_row + 1}:#{start_col + 1}> can move " +
+        "to <#{dest_row + 1}:#{dest_col + 1}>"
+      move_strings << move_str
+    end
+    num_unique_pieces = moves.map{|move| move[0]}.uniq.count
+    move_strings << "#{moves.length} legal moves (#{num_unique_pieces} unique" +
+    " pieces) for #{color_string(color)} player"
+    move_strings
+  end
+
+  def color_string(color)
+    color == 'W' ? 'white' : 'black'
   end
 
   def find_pieces(color)
@@ -43,7 +68,12 @@ class Chess
   def check_player_moves(pieces, color)
     moves = []
     pieces.each do |piece|
+      possible_moves = check_piece_moves(piece, color).sort
+      possible_moves.each do |move|
+        moves << [piece, move]
+      end
     end
+    moves
   end
 
   def check_piece_moves(piece, color)
