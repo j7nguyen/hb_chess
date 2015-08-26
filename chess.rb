@@ -81,27 +81,71 @@ class Chess
   end
 
   def find_rook_moves(piece, color)
+    find_horiz_vert_line_moves(piece, color)
   end
 
   def find_knight_moves(piece, color)
+    directions = [[1,2], [1,-2], [2,1], [2,-1], [-1,2], [-1,-2], [-2,1], [-2,-1]]
+    find_one_move(directions, piece, color)
   end
 
   def find_bishop_moves(piece, color)
+    find_diagonal_line_moves(piece, color)
   end
 
   def find_king_moves(piece, color)
+    directions = [[-1,-1], [-1,0], [-1,1], [0,-1],[0,1],[1,-1],[1,0],[1,1]]
+    find_one_move(directions, piece, color)
   end
 
   def find_queen_moves(piece, color)
+    straight_moves = find_horiz_vert_line_moves(piece, color)
+    diagonal_moves = find_diagonal_line_moves(piece, color)
+    straight_moves + diagonal_moves
   end
 
-  def find_straight_line_moves(rownum, colnum, board, color)
+  def find_horiz_vert_line_moves(piece, color)
+    directions = [[-1,0], [0,-1], [0,1], [1,0]]
+    find_line_moves(directions, piece, color)
   end
 
-  def find_diagonal_line_moves(rownum, colnum, board, color)
+  def find_diagonal_line_moves(piece, color)
+    directions = [[-1,-1], [-1,1], [1,-1], [1,1]]
+    find_line_moves(directions, piece, color)
+  end
+
+  def find_one_move(directions, piece, color)
+    moves = []
+    row, col = piece[1,2]
+    directions.each do |direction|
+      check_row, check_col = row + direction[0], col + direction[1]
+      moves << [check_row, check_col] if legal_space?(check_row, check_col, color)
+    end
+    moves
+  end
+
+  def find_line_moves(directions, piece, color)
+    moves = []
+    row, col = piece[1,2]
+    directions.each do |direction|
+      check_row, check_col = row + direction[0], col + direction[1]
+      exhausted = false
+      until exhausted
+        if legal_space?(check_row, check_col, color)
+          moves << [check_row, check_col]
+          exhausted = true unless @board[check_row][check_col] == 'EE'
+          check_row += direction[0]
+          check_col += direction[1]
+        else
+          exhausted = true
+        end
+      end
+    end
+    moves
   end
 
   def legal_space?(row, col, color)
+    return false if row < 0 || col < 0 || row > 7 || col > 7
     space = @board[row][col]
     space == 'EE' || space[0] != color
   end
