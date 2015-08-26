@@ -113,6 +113,8 @@ class Chess
     end
   end
 
+  # Accounts for all the unique ways in which pawns can move and capture.
+  #
   def find_pawn_moves(piece, color)
     moves = []
     row, col = piece[1,2]
@@ -218,6 +220,9 @@ class Chess
   end
 end
 
+
+# Example to demonstrate pawn capture ability and other piece movements.
+#
 test_board = [
   ['BR','BN','BB','BK','EE','BB','BN','BR'],
   ['BP','BP','BP','BP','EE','BP','BP','BP'],
