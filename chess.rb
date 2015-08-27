@@ -42,6 +42,7 @@ class Chess
   # the strings in an array.
   #
   def print_moves(color)
+    color = color[0].upcase
     puts formatted_moves(color)
   end
 
@@ -234,8 +235,8 @@ test_board = [
   ['EE','EE','EE','WP','WP','EE','WQ','EE'],
   ['EE','EE','EE','EE','EE','EE','EE','EE'],
   ['WP','WP','WP','EE','EE','WP','WP','WP'],
-  ['WR','WN','WB','WK','WQ','WB','WN','WR']
+  ['WR','WN','WB','WK','EE','WB','WN','WR']
 ]
 
-game = Chess.new
-game.print_moves('W')
+game = Chess.new(test_board)
+game.print_moves('white')
