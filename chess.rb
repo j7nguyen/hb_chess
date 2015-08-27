@@ -238,5 +238,5 @@ test_board = [
   ['WR','WN','WB','WK','EE','WB','WN','WR']
 ]
 
-game = Chess.new(test_board)
-game.print_moves('white')
+game = Chess.new
+game.print_moves('w')
