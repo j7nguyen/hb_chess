@@ -1,9 +1,10 @@
-# This program takes in a state of a chess board, represented by an array of arrays.
-# Each row has 'EE' for empty, or two-character string with the first character representing
-# the color of the piece and the second character representing the type, i.e. 'WN' for white knight.
-# 'P' = Pawn, 'R' = Rook, 'N' = Knight, 'B' = Bishop, 'K' = King, 'Q' = Queen
+# This program takes in a state of a chess board, represented by an array of
+# arrays. Each row has 'EE' for empty, or two-character string with the first
+# character representing the color of the piece and the second character
+# representing the type, i.e. 'WN' for white knight.
 
 # Methods assume correctly formatted inputs, including the board and color.
+# Calculations are performed using 0-7 as indices, but output indices are 1-8.
 
 class Chess
   # default state for the board of a chess object
@@ -29,15 +30,16 @@ class Chess
   }
   attr_accessor :board
 
-  # Create a Chess object with a board formatted like INITIAL_STATE above. If a board
-  # is not passed in, INITIAL_STATE will be used.
+  # Create a Chess object with a board formatted like INITIAL_STATE above.
+  # If a board is not passed in, INITIAL_STATE will be used.
   #
   def initialize(board=INITIAL_STATE)
     @board = board
   end
 
-  # Once a board is created, formatted possible moves for each color can be generated.
-  # Use print_moves for an easy-to-read format or formatted_moves for the strings in an array.
+  # Once a board is created, formatted possible moves for each color can be
+  # generated. Use print_moves for an easy-to-read format or formatted_moves for
+  # the strings in an array.
   #
   def print_moves(color)
     puts formatted_moves(color)
@@ -51,13 +53,13 @@ class Chess
       piece_name = PIECES[move[0][0]]
       start_row, start_col = move[0][1,2]
       dest_row, dest_col = move[1]
-      move_str = "#{piece_name} at <#{start_row + 1}:#{start_col + 1}> can move " +
-        "to <#{dest_row + 1}:#{dest_col + 1}>"
+      move_str = "#{piece_name} at <#{start_row + 1}:#{start_col + 1}> can " +
+        "move to <#{dest_row + 1}:#{dest_col + 1}>"
       move_strings << move_str
     end
     num_unique_pieces = moves.map{|move| move[0]}.uniq.count
-    move_strings << "#{moves.length} legal moves (#{num_unique_pieces} unique" +
-    " pieces) for #{color_string(color)} player"
+    move_strings << "#{moves.length} legal moves (#{num_unique_pieces} " +
+    "unique pieces) for #{color_string(color)} player"
     move_strings
   end
 
@@ -79,7 +81,7 @@ class Chess
     pieces
   end
 
-  # For each piece, checks all moves and adds them to an array of the player's moves.
+  # For each piece, checks all moves and creates an array of possible moves.
   #
   def check_player_moves(pieces, color)
     moves = []
@@ -121,17 +123,17 @@ class Chess
     direction = (color == 'W' ? -1 : 1)
     start_row = (color == 'W' ? 6 : 1)
     one_forward, two_forward = row + direction, row + 2 * direction
-    if @board[one_forward][col] == 'EE'
+    if @board[one_forward][col] == 'EE' && legal_space?(one_forward, col, color)
       moves << [one_forward, col]
-      if row == start_row && @board[two_forward][col]
+      if row == start_row && @board[two_forward][col] == 'EE'
         moves << [two_forward, col]
       end
     end
     opposite = (color == 'W' ? 'B' : 'W')
     [[one_forward, col - 1], [one_forward, col + 1]].each do |capture_try|
-      check_row, check_col = capture_try
-      if legal_space?(check_row, check_col, color) && @board[check_row][check_col][0] == opposite
-        moves << capture_try
+      cap_row, cap_col = capture_try
+      if legal_space?(cap_row, cap_col, color)
+        moves << capture_try if @board[cap_row][cap_col][0] == opposite
       end
     end
     moves
@@ -142,7 +144,7 @@ class Chess
   end
 
   def find_knight_moves(piece, color)
-    directions = [[1,2], [1,-2], [2,1], [2,-1], [-1,2], [-1,-2], [-2,1], [-2,-1]]
+    directions = [[1,2],[1,-2],[2,1],[2,-1],[-1,2],[-1,-2],[-2,1],[-2,-1]]
     find_one_move(directions, piece, color)
   end
 
@@ -151,7 +153,7 @@ class Chess
   end
 
   def find_king_moves(piece, color)
-    directions = [[-1,-1], [-1,0], [-1,1], [0,-1],[0,1],[1,-1],[1,0],[1,1]]
+    directions = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
     find_one_move(directions, piece, color)
   end
 
@@ -187,8 +189,9 @@ class Chess
     moves
   end
 
-  # Used by rooks, bishops, and queens. Keeps going in a direction until it reaches
-  # an edge of the board, the player's own piece, or the player has captured a piece.
+  # Used by rooks, bishops, and queens. Finds possible moves along a line until
+  # it reaches an edge of the board, the player's own piece, or the player has
+  # captured a piece.
   #
   def find_line_moves(directions, piece, color)
     moves = []
@@ -234,5 +237,5 @@ test_board = [
   ['WR','WN','WB','WK','WQ','WB','WN','WR']
 ]
 
-game = Chess.new(test_board)
+game = Chess.new
 game.print_moves('W')
