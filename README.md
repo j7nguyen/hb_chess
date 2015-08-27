@@ -23,10 +23,12 @@ Once you have a Chess object, you can call print_moves and pass a color as a str
 
 The string passed in only has to have 'w' or 'b' as the first character, so 'white', 'B', or 'Black' would all work.
 
-Creating a standard starting chess board and calling print_moves for the white player will list every possible move along with a summary:
+Creating a standard starting chess board and calling print_moves for the white player will list every possible move along with a summary.
 
     chess = Chess.new
     chess.print_moves('w')
+
+Will output the following:
 
     Pawn at <7:1> can move to <5:1>
     Pawn at <7:1> can move to <6:1>
